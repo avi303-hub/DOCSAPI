@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Docs Creator</title>
+</head>
+<body>
+    <h1>Google Docs Creator</h1>
+    
+    {% if not user.is_authenticated %}
+    <p><a href="/admin/login/?next=/">Login first</a></p>
+    {% else %}
+    <div>
+        <h2>Step 1: Authenticate with Google</h2>
+        <button onclick="window.location.href='/auth/google/'">Authenticate with Google</button>
+    </div>
+    
+    <div>
+        <h2>Step 2: Create Document</h2>
+        <form id="docForm">
+            <label for="title">Document Title:</label><br>
+            <input type="text" id="title" name="title" value="My New Document"><br><br>
+            
+            <label for="content">HTML Content:</label><br>
+            <textarea id="content" name="content" rows="10" cols="50">
+<h1>Document Title</h1>
+<p>This is a <b>bold</b> and <i>italic</i> text example.</p>
+<ul>
+    <li>First item</li>
+    <li>Second item</li>
+</ul>
+            </textarea><br><br>
+            
+            <button type="submit">Create Document</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        document.getElementById('docForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value
+            };
+            
+            try {
+                const response = await fetch('/create-doc/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('result').innerHTML = `
+                        <p>Document created successfully!</p>
+                        <a href="${data.url}" target="_blank">Open Document</a>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <p>Error: ${data.error}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
