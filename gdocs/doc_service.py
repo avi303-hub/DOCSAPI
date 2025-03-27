@@ -24,7 +24,6 @@ def html_to_google_docs_format(html_content):
 
         end_index = current_index + len(text)
         
-        # Apply text style if needed
         if style:
             requests.append({
                 'updateTextStyle': {
@@ -34,7 +33,6 @@ def html_to_google_docs_format(html_content):
                 }
             })
         
-        # Apply paragraph style (for headings)
         if paragraph_style:
             requests.append({
                 'updateParagraphStyle': {
@@ -77,11 +75,10 @@ def create_google_doc(user, html_content, title="New Document"):
     
     service = build('docs', 'v1', credentials=auth)
     
-    # Create blank document
+    
     doc = service.documents().create(body={'title': title}).execute()
     doc_id = doc['documentId']
     
-    # Apply formatting
     requests = html_to_google_docs_format(html_content)
     if requests:
         service.documents().batchUpdate(

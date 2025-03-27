@@ -48,7 +48,7 @@ def oauth2callback(request):
     return Response({'status': 'Google authentication successful'})
 import logging
 
-logger = logging.getLogger(__name__)  # Set up logging
+logger = logging.getLogger(__name__)  
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -63,7 +63,7 @@ def create_doc(request):
         doc_url = create_google_doc(request.user, html_content, title)
         return Response({'url': doc_url}, status=status.HTTP_201_CREATED)
     except Exception as e:
-        logger.error(f"Error creating Google Doc: {e}", exc_info=True)  # Logs full error stack trace
+        logger.error(f"Error creating Google Doc: {e}", exc_info=True)  
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 from django.shortcuts import render
